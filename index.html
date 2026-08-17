@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanish Suf Cosmetics — Digital Receipt Book (Fixed & Recovered)</title>
+<style>
+:root{--gold:#c79a3b;--navy:#13233b;--ink:#17202a;--muted:#68727e;--line:#e6e8eb;--paper:#fff;--bg:#f4f6f8}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,var(--navy),#263b5d);color:#fff;padding:24px 20px}
+.wrap{max-width:1100px;margin:auto}
+.brand{display:flex;justify-content:space-between;gap:20px;align-items:center}
+.brand h1{margin:0;font-size:26px}.brand p{margin:6px 0 0;color:#e8edf4}
+.phone{font-weight:700;text-align:right}
+nav{background:#fff;border-bottom:1px solid var(--line);padding:12px 20px;position:sticky;top:0;z-index:5}
+.navin{max-width:1100px;margin:auto;display:flex;gap:10px;flex-wrap:wrap}
+button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer}
+.primary{background:var(--gold);color:#fff}.secondary{background:#eef1f4;color:var(--navy)}.danger{background:#f7e5e5;color:#9d2f2f}
+main{padding:24px 20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 4px 18px #15233b0b}
+h2{margin-top:0;color:var(--navy)}label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d9dde2;border-radius:8px;font-size:14px;background:#fff}
+textarea{min-height:75px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.items{width:100%;border-collapse:collapse;margin-top:10px}.items th,.items td{border-bottom:1px solid var(--line);padding:8px;text-align:left}.items th{font-size:12px;color:var(--muted)}
+.items input{padding:8px}.right{text-align:right}.totals{margin-top:15px;max-width:340px;margin-left:auto}.totals div{display:flex;justify-content:space-between;padding:7px 0}.grand{font-size:18px;font-weight:800;border-top:2px solid var(--navy)}
+.receipt{max-width:800px;margin:auto;background:#fff;padding:34px;min-height:700px;position:relative;overflow:hidden}.receipt::before{content:'KANISH SUF COSMETICS';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:58px;font-weight:900;letter-spacing:4px;color:rgba(19,35,59,.055);transform:rotate(-28deg);pointer-events:none;z-index:0;white-space:nowrap}.receipt>*{position:relative;z-index:1}
+.receipt-head{display:flex;justify-content:space-between;border-bottom:4px solid var(--gold);padding-bottom:18px;background:linear-gradient(90deg,rgba(199,154,59,.08),transparent);padding:18px;border-radius:10px}
+.receipt h1{color:var(--navy);margin:0}.tag{color:var(--gold);font-weight:900;letter-spacing:1px}.meta{margin:22px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.summary{margin-top:25px}.thanks{text-align:center;margin-top:45px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
+.history{margin-top:20px}.history table{width:100%;border-collapse:collapse}.history th,.history td{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
+.small{font-size:12px;color:var(--muted)}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.brand{align-items:flex-start;flex-direction:column}.phone{text-align:left}.receipt{padding:20px}.row,.meta{grid-template-columns:1fr}}
+@media print{body{background:#fff}.no-print,header,nav,main>.grid,.history{display:none!important}.receipt{display:block!important;box-shadow:none;border:0;padding:20px;max-width:none}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+.report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}.report-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}.report-box .label{font-size:12px;color:var(--muted);font-weight:700}.report-box .value{font-size:20px;font-weight:900;color:var(--navy);margin-top:6px}.report-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.report-controls>div{min-width:150px;flex:1}.qr-area{margin-top:24px;padding:20px;border:1px dashed var(--gold);border-radius:12px;text-align:center;background:#fff}#qrCode,#receiptQR{display:flex;justify-content:center;margin:12px 0}.verify-note{font-size:12px;color:var(--muted);word-break:break-word}@media(max-width:800px){.report-grid{grid-template-columns:1fr 1fr}}@media(max-width:500px){.report-grid{grid-template-columns:1fr}}@media print{.reports-section{display:none!important}}
+</style>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#13233b"></head>
+<body>
+<header>
+<div class="wrap brand">
+<div><h1>KANISH SUF COSMETICS</h1><p>Skincare Products & Facial Services</p></div>
+<div class="phone">WhatsApp & Calls<br>0742 350513</div>
+</div>
+</header>
+<nav class="no-print"><div class="navin">
+<button class="primary" onclick="newReceipt()">New Receipt</button>
+<button class="secondary" onclick="saveReceipt()">Save Receipt</button>
+<button class="secondary" onclick="downloadPDF()">Print / Save as PDF</button>
+<button class="secondary" onclick="shareReceipt()">Share Receipt</button><button class="secondary" onclick="showReports()">Income Reports</button><button class="secondary" onclick="backupReceipts()">Backup Data</button><button class="secondary" onclick="restoreReceipts()">Restore Data</button>
+</div></nav>
+
+<main class="wrap">
+<div class="grid no-print">
+<section class="card">
+<h2>Create Receipt</h2>
+<div class="row">
+<div><label>Receipt Number</label><input id="receiptNo" readonly></div>
+<div><label>Date</label><input id="date" type="date"></div>
+</div>
+<div class="row">
+<div><label>Customer Name</label><input id="customer" placeholder="Customer name"></div>
+<div><label>Customer Phone</label><input id="customerPhone" placeholder="Phone number"></div>
+</div>
+<label>Payment Method</label>
+<select id="payment"><option>Cash</option><option>Mobile Money</option><option>Bank Transfer</option><option>Card</option><option>Other</option></select>
+
+<table class="items">
+<thead><tr><th>Item / Service</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+<tbody id="items"></tbody>
+</table>
+<button class="secondary" style="margin-top:12px" onclick="addItem()">+ Add Item</button>
+
+<div class="row">
+<div><label>Discount</label><input id="discount" type="number" min="0" value="0" oninput="calculate()"></div>
+<div><label>Amount Paid</label><input id="paid" type="number" min="0" value="0" oninput="calculate()"></div>
+</div>
+<label>Notes</label><textarea id="notes" placeholder="Optional notes"></textarea>
+</section>
+
+<section class="card">
+<h2>Receipt Preview</h2>
+<p class="small">This preview is the version you can print, save as PDF, or share.</p>
+</section>
+</div>
+
+<section class="receipt" id="receipt">
+<div class="receipt-head">
+<div><div class="tag">OFFICIAL RECEIPT</div><h1>KANISH SUF COSMETICS</h1><div>Skincare Products & Facial Services</div></div>
+<div class="right"><strong id="rNo"></strong><br><span id="rDate"></span><br><br><strong>WhatsApp & Calls</strong><br>0742 350513</div>
+</div>
+<div class="meta">
+<div><strong>Customer:</strong> <span id="rCustomer">—</span></div>
+<div><strong>Phone:</strong> <span id="rPhone">—</span></div>
+<div><strong>Payment:</strong> <span id="rPayment">Cash</span></div>
+</div>
+<table class="items"><thead><tr><th>Item / Service</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody id="rItems"></tbody></table>
+<div class="totals">
+<div><span>Subtotal</span><strong id="rSubtotal">UGX 0</strong></div>
+<div><span>Discount</span><strong id="rDiscount">UGX 0</strong></div>
+<div class="grand"><span>Total</span><strong id="rTotal">UGX 0</strong></div>
+<div><span>Amount Paid</span><strong id="rPaid">UGX 0</strong></div>
+<div><span>Balance</span><strong id="rBalance">UGX 0</strong></div>
+</div>
+<div style="margin-top:25px"><strong>Notes:</strong> <span id="rNotes">—</span></div>
+<div style="text-align:center;margin-top:25px"><div id="receiptQR"></div><div class="small">Scan to verify this receipt</div></div><div class="thanks">Thank you for choosing Kanish Suf Cosmetics.<br><strong>Your skin, our passion.</strong></div>
+</section>
+
+<section class="card reports-section" id="reportsSection">
+<h2>Income Records & Reports</h2>
+<p class="small">Income is calculated from saved receipts.</p>
+<div class="report-controls"><div><label>Report Period</label><select id="reportPeriod" onchange="renderReports()"><option value="week">This Week</option><option value="month" selected>This Month</option><option value="year">This Year</option><option value="all">All Time</option></select></div><div><label>Year</label><select id="reportYear" onchange="renderReports()"></select></div><div><button class="primary" onclick="renderReports()">Refresh Report</button></div></div>
+<div class="report-grid">
+<div class="report-box"><div class="label">INCOME</div><div class="value" id="incomeTotal">UGX 0</div></div>
+<div class="report-box"><div class="label">RECEIPTS</div><div class="value" id="incomeCount">0</div></div>
+<div class="report-box"><div class="label">AVERAGE RECEIPT</div><div class="value" id="incomeAverage">UGX 0</div></div>
+<div class="report-box"><div class="label">OUTSTANDING BALANCE</div><div class="value" id="incomeBalance">UGX 0</div></div>
+</div>
+<div class="qr-area"><strong>Receipt Verification QR Code</strong><div id="qrCode"></div><div class="verify-note" id="qrText">Save a receipt to generate its verification QR code.</div><button class="secondary" onclick="generateQR()">Refresh QR Code</button></div>
+</section>
+<section class="card history no-print">
+<h2>Receipt History</h2>
+<p class="small">Receipts saved in this browser are kept on this device. Receipt numbers advance only when a new receipt is actually saved, so unused drafts do not consume numbers.</p>
+<table><thead><tr><th>Receipt</th><th>Date</th><th>Customer</th><th>Total</th><th>Action</th></tr></thead><tbody id="history"></tbody></table>
+</section>
+</main>
+
+<script>
+let currentNo=0;
+let currentSaved=false;
+const $=id=>document.getElementById(id);
+function fmt(n){return "UGX "+Number(n||0).toLocaleString("en-UG")}
+
+function getHistory(){
+  return JSON.parse(localStorage.getItem("kscReceipts")||"[]");
+}
+
+function getNextReceiptNumber(){
+  const h=getHistory();
+  const nums=h.map(x=>parseInt(String(x.no||"").replace("KSC-",""),10)).filter(Number.isFinite);
+  const highest=nums.length?Math.max(...nums):0;
+  const next=highest+1;
+  return "KSC-"+String(next).padStart(4,"0");
+}
+
+function newReceipt(){
+  $("receiptNo").value=getNextReceiptNumber();
+  currentSaved=false;
+  $("date").value=new Date().toISOString().slice(0,10);
+  $("customer").value="";
+  $("customerPhone").value="";
+  $("payment").value="Cash";
+  $("discount").value=0;
+  $("paid").value=0;
+  $("notes").value="";
+  $("items").innerHTML="";
+  addItem();
+  calculate();
+}
+function addItem(name="",qty=1,price=0){let tr=document.createElement("tr");tr.innerHTML=`<td><input class="iname" value="${name}" placeholder="Product or service"></td><td><input class="iqty" type="number" min="0" value="${qty}" oninput="calculate()"></td><td><input class="iprice" type="number" min="0" value="${price}" oninput="calculate()"></td><td class="itotal">0</td><td><button class="danger" onclick="this.closest('tr').remove();calculate()">×</button></td>`;$("items").appendChild(tr);calculate()}
+function calculate(){
+let sub=0,rows=[];$("items").querySelectorAll("tr").forEach(tr=>{let q=Number(tr.querySelector(".iqty").value||0),p=Number(tr.querySelector(".iprice").value||0),t=q*p;tr.querySelector(".itotal").textContent=fmt(t);sub+=t;rows.push({name:tr.querySelector(".iname").value,qty:q,price:p,total:t})});
+let d=Number($("discount").value||0),total=Math.max(0,sub-d),paid=Number($("paid").value||0),bal=Math.max(0,total-paid);
+$("rNo").textContent=$("receiptNo").value;$("rDate").textContent=$("date").value;$("rCustomer").textContent=$("customer").value||"—";$("rPhone").textContent=$("customerPhone").value||"—";$("rPayment").textContent=$("payment").value;$("rSubtotal").textContent=fmt(sub);$("rDiscount").textContent=fmt(d);$("rTotal").textContent=fmt(total);$("rPaid").textContent=fmt(paid);$("rBalance").textContent=fmt(bal);$("rNotes").textContent=$("notes").value||"—";
+$("rItems").innerHTML=rows.map(x=>`<tr><td>${escapeHtml(x.name||"—")}</td><td>${x.qty}</td><td>${fmt(x.price)}</td><td>${fmt(x.total)}</td></tr>`).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function data(){let rows=[];$("items").querySelectorAll("tr").forEach(tr=>rows.push({name:tr.querySelector(".iname").value,qty:Number(tr.querySelector(".iqty").value||0),price:Number(tr.querySelector(".iprice").value||0)}));let sub=rows.reduce((a,x)=>a+x.qty*x.price,0),d=Number($("discount").value||0),total=Math.max(0,sub-d);return {no:$("receiptNo").value,date:$("date").value,customer:$("customer").value,phone:$("customerPhone").value,payment:$("payment").value,items:rows,discount:d,paid:Number($("paid").value||0),total,notes:$("notes").value}}
+function saveReceipt(){
+  let d=data(),h=getHistory();
+  let i=h.findIndex(x=>x.no===d.no);
+  if(i>=0){
+    h[i]=d;
+  }else{
+    // The receipt number is consumed only here, when the receipt is actually saved.
+    h.push(d);
+  }
+  localStorage.setItem("kscReceipts",JSON.stringify(h));
+  currentSaved=true;
+  currentNo=parseInt(String(d.no||"").replace("KSC-",""),10)||0;
+  renderHistory();renderReports();generateQR();generateReceiptQR();
+  alert("Receipt saved successfully.");
+}
+function renderHistory(){let h=JSON.parse(localStorage.getItem("kscReceipts")||"[]");$("history").innerHTML=h.slice().reverse().map(x=>`<tr><td>${x.no}</td><td>${x.date}</td><td>${escapeHtml(x.customer||"—")}</td><td>${fmt(x.total)}</td><td><button class="secondary" onclick='loadReceipt(${JSON.stringify(x).replace(/'/g,"&#39;")})'>Open</button></td></tr>`).join("")}
+function loadReceipt(x){
+  $("receiptNo").value=x.no;
+  currentSaved=true;
+  currentNo=parseInt(String(x.no||"").replace("KSC-",""),10)||0;
+  $("date").value=x.date;
+  $("customer").value=x.customer;
+  $("customerPhone").value=x.phone;
+  $("payment").value=x.payment;
+  $("discount").value=x.discount;
+  $("paid").value=x.paid;
+  $("notes").value=x.notes;
+  $("items").innerHTML="";
+  x.items.forEach(i=>addItem(i.name,i.qty,i.price));
+  calculate();generateQR();generateReceiptQR();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function downloadPDF(){window.print()}
+async function shareReceipt(){saveReceipt();let text=`Kanish Suf Cosmetics\\nReceipt: ${$("receiptNo").value}\\nCustomer: ${$("customer").value||"—"}\\nTotal: ${$("rTotal").textContent}\\nWhatsApp & Calls: 0742 350513`;if(navigator.share){try{await navigator.share({title:"Kanish Suf Cosmetics Receipt",text})}catch(e){}}else{window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank")}}
+
+function getHistory(){return JSON.parse(localStorage.getItem("kscReceipts")||"[]")}
+function receiptBalance(x){return Math.max(0,Number(x.total||0)-Number(x.paid||0))}
+function parseReceiptDate(s){if(!s)return null;let d=new Date(s+"T00:00:00");return isNaN(d.getTime())?null:d}
+function startOfWeek(d){let x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-x.getDay());return x}
+function inReportPeriod(s,p,y){let d=parseReceiptDate(s);if(!d)return false;let n=new Date();if(p==="all")return true;if(p==="year")return d.getFullYear()===y;if(p==="month")return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();let st=startOfWeek(n),en=new Date(st);en.setDate(en.getDate()+7);return d>=st&&d<en}
+function populateReportYears(){let h=getHistory(),ys=new Set([new Date().getFullYear()]);h.forEach(x=>{let d=parseReceiptDate(x.date);if(d)ys.add(d.getFullYear())});let s=$("reportYear"),old=s.value;s.innerHTML=[...ys].sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}</option>`).join("");if(ys.has(Number(old)))s.value=old}
+function renderReports(){if(!$("reportPeriod"))return;populateReportYears();let p=$("reportPeriod").value,y=Number($("reportYear").value)||new Date().getFullYear(),rows=getHistory().filter(x=>inReportPeriod(x.date,p,y)),total=rows.reduce((a,x)=>a+Number(x.total||0),0),bal=rows.reduce((a,x)=>a+receiptBalance(x),0);$("incomeTotal").textContent=fmt(total);$("incomeCount").textContent=rows.length;$("incomeAverage").textContent=fmt(rows.length?total/rows.length:0);$("incomeBalance").textContent=fmt(bal)}
+function verificationText(x){return "Kanish Suf Cosmetics Receipt Verification\n"+JSON.stringify({business:"Kanish Suf Cosmetics",receipt:x.no,date:x.date,customer:x.customer||"",total:Number(x.total||0),paid:Number(x.paid||0)})}
+function generateQR(){let box=$("qrCode");if(!box)return;box.innerHTML="";let x=getHistory().find(r=>r.no===$("receiptNo").value);if(!x){$("qrText").textContent="Save this receipt first to generate a verification QR code.";return}new QRCode(box,{text:verificationText(x),width:150,height:150});$("qrText").textContent="Scan to verify the receipt details."}
+function generateReceiptQR(){let box=$("receiptQR");if(!box)return;box.innerHTML="";let x=getHistory().find(r=>r.no===$("receiptNo").value);if(x)new QRCode(box,{text:verificationText(x),width:90,height:90})}
+function backupReceipts(){
+  const payload = {
+    format:"Kanish Suf Cosmetics Receipt Book Backup",
+    version:1,
+    exportedAt:new Date().toISOString(),
+    receipts:getHistory()
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="kanish_suf_cosmetics_receipts_backup.json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function restoreReceipts(){
+  const input=document.createElement("input");
+  input.type="file"; input.accept=".json,application/json";
+  input.onchange=()=>{
+    const file=input.files&&input.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const payload=JSON.parse(reader.result);
+        const incoming=Array.isArray(payload)?payload:payload.receipts;
+        if(!Array.isArray(incoming)) throw new Error("Invalid backup");
+        const existing=getHistory();
+        const map=new Map(existing.map(r=>[r.no,r]));
+        incoming.forEach(r=>{if(r&&r.no)map.set(r.no,r);});
+        const merged=[...map.values()].sort((a,b)=>{
+          const na=parseInt(String(a.no).replace("KSC-",""),10)||0;
+          const nb=parseInt(String(b.no).replace("KSC-",""),10)||0;
+          return na-nb;
+        });
+        localStorage.setItem("kscReceipts",JSON.stringify(merged));
+        renderHistory(); populateReportYears(); renderReports(); generateQR(); generateReceiptQR();
+        alert("Receipt data restored successfully. Existing records were preserved and merged.");
+      }catch(e){alert("That backup file could not be restored.");}
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+function protectReceiptNumber(){
+  const h=getHistory();
+  const highest=h.map(x=>parseInt(String(x.no||"").replace("KSC-",""),10))
+    .filter(Number.isFinite).reduce((a,b)=>Math.max(a,b),0);
+  if(!$("receiptNo").value || parseInt(String($("receiptNo").value).replace("KSC-",""),10)<=highest && !currentSaved){
+    $("receiptNo").value="KSC-"+String(highest+1).padStart(4,"0");
+  }
+}
+
+function showReports(){renderReports();$("reportsSection").scrollIntoView({behavior:"smooth"})}
+
+newReceipt();renderHistory();populateReportYears();renderReports();
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}</script></body>
+</html>
