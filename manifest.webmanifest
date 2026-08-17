@@ -1,0 +1,9 @@
+{
+  "name": "Kanish Suf Cosmetics Receipt Book",
+  "short_name": "Kanish Receipts",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#13233b",
+  "orientation": "portrait"
+}
