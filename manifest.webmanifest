@@ -1,16 +1,15 @@
 {
-  "name": "Kanish Suf Cosmetics Receipt Book",
-  "short_name": "Kanish Receipts",
-  "description": "Receipt management and invoice tracking app for Kanish Suf Cosmetics.",
-  "start_url": "./",
+  "name": "Kanish Suf Business Book",
+  "short_name": "Kanish Suf",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f4f6f8",
-  "theme_color": "#13233b",
-  "orientation": "portrait",
+  "background_color": "#f4efe5",
+  "theme_color": "#17130f",
+  "description": "Receipts, sales, customers, stock, expenses and reports for Kanish Suf Cosmetics.",
   "icons": [
     {
       "src": "icon.svg",
-      "sizes": "512x512 192x192",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
